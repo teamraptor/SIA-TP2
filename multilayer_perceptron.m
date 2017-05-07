@@ -38,7 +38,16 @@ function [weights,output,error] = multilayer_perceptron_learn(entries, expected_
             output(index);
             d{M} = activation_der(weights{M}*layer_entry{M}')*(expected_output(index) - output(index));
             for i = M-1:-1:1
-                d{i} = (activation_der(weights{i}*layer_entry{i}')' .* sum(weights{i+1}(:,2:end) .* d{i+1}'))';
+                activation_der(weights{i}*layer_entry{i}')';
+                weights{i+1}(:,2:end);
+                d{i+1}';
+                [r,c] = size(d{i+1});
+                delta = d{i+1};
+                if(r<c)
+                    delta = d{i+1}';
+                end
+                delta;
+                d{i} = (activation_der(weights{i}*layer_entry{i}')' .* sum(weights{i+1}(:,2:end) .* delta))';
             end
             d;
             weights;
