@@ -1,0 +1,24 @@
+# Created by Octave 4.2.1, Mon May 08 15:57:55 2017 -03 <mfraga@localhost>
+# name: learning_factor
+# type: scalar
+0.5
+
+# name: max_iterations
+# type: scalar
+1000
+
+# name: tolerance
+# type: scalar
+1e-5
+
+# name: neurons_per_layer
+# type: matrix
+# rows: 1
+# columns: 3 
+ 2 10 1
+
+# name: initial_data
+# type: string
+# elements: 1
+# length: 4
+terrain03.data
