@@ -8,9 +8,9 @@ function output = get_output(entries, weights, neurons_per_layer, activation_fun
     M = m;
     i = 1;
     for entry = entries
-        layer_entry = [-1,entry];
+            layer_entry{1}(2:end) = [entry];
         for m = 2:M
-            layer_entry = [-1,activation_func(weights{m-1} * layer_entry{m-1}')];
+                layer_entry{m}(2:end) = activation_func(weights{m-1} * layer_entry{m-1}');
         end
         output(i) = activation_func(weights{M} * layer_entry{M}');
         i = i + 1;
@@ -28,7 +28,7 @@ function [weights,output,error_per_iteration] = multilayer_perceptron_learn(entr
     %setup
     for i = 2:length(neurons_per_layer)
         m = m + 1;
-        weights{m} = rand(neurons_per_layer(i), neurons_per_layer(i-1)+1) .- 0.5;
+        weights{m} = (rand(neurons_per_layer(i), neurons_per_layer(i-1)+1) .- 0.5)./neurons_per_layer(i-1);
         layer_entry{m} = [-1, zeros(1, neurons_per_layer(i-1))];
     	h{m} = [-1 ,zeros(1, neurons_per_layer(i-1))];
     end
@@ -65,7 +65,9 @@ function [weights,output,error_per_iteration] = multilayer_perceptron_learn(entr
             end
         end
         %get iteration error
-        error_per_iteration(iteration) = sum((expected_output - output).^2);
+        error_per_iteration(iteration) = sum((expected_output - output).^2)/n;
+        error_per_iteration(iteration)
+        fflush(1);
         if error_per_iteration(iteration) <= tolerance
             return
         end
