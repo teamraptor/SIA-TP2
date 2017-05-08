@@ -18,7 +18,7 @@ function output = get_output(entries, weights, neurons_per_layer, activation_fun
 end
 
 function [weights,output,error_per_iteration] = multilayer_perceptron_learn(entries, expected_output, neurons_per_layer, activation_func, activation_der,
-                                    learning_factor=.5, max_iterations=1000, tolerance=1e-5)
+                                    learning_factor=.5, max_iterations=1000, tolerance=1e-5, dbug=false)
     %number of entries
     n = length(entries(1,:));
 
@@ -30,12 +30,11 @@ function [weights,output,error_per_iteration] = multilayer_perceptron_learn(entr
         m = m + 1;
         weights{m} = rand(neurons_per_layer(i), neurons_per_layer(i-1)+1) .- 0.5;
         layer_entry{m} = [-1, zeros(1, neurons_per_layer(i-1))];
-	h{m} = [-1 ,zeros(1, neurons_per_layer(i-1))];
+    	h{m} = [-1 ,zeros(1, neurons_per_layer(i-1))];
     end
 
     %last layer
     M = m;
-
 
     for iteration = 1:max_iterations
         
@@ -44,10 +43,14 @@ function [weights,output,error_per_iteration] = multilayer_perceptron_learn(entr
             %get layers output 
             layer_entry{1}(2:end) = entries(:, index);
             for m = 2:M
-		h{m-1} = weights{m-1} * layer_entry{m-1}';
+		        h{m-1} = weights{m-1} * layer_entry{m-1}';
                 layer_entry{m}(2:end) = activation_func(h{m-1});
             end
-	    h{M} = weights{M} * layer_entry{M}';
+            if dbug 
+                layer_entry
+                fflush(1);
+	        end
+            h{M} = weights{M} * layer_entry{M}';
             output(index) = activation_func(h{M});
             %get errors
             d{M} = activation_der(h{M})*(expected_output(index) - output(index));
