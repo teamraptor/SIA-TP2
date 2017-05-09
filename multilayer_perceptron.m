@@ -28,16 +28,16 @@ function [weights,output,error_per_iteration] = multilayer_perceptron_learn(entr
     %setup
     for i = 2:length(neurons_per_layer)
         m = m + 1;
-        weights{m} = (rand(neurons_per_layer(i), neurons_per_layer(i-1)+1) .- 0.5)./neurons_per_layer(i-1);
+        %weights{m} = (2*(rand(neurons_per_layer(i), neurons_per_layer(i-1)+1) .- 0.5))./100;
+        weights{m} = (rand(neurons_per_layer(i), neurons_per_layer(i-1)+1) .- 0.5)./(neurons_per_layer(i-1));
         layer_entry{m} = [-1, zeros(1, neurons_per_layer(i-1))];
     	h{m} = [-1 ,zeros(1, neurons_per_layer(i-1))];
     end
-
     %last layer
     M = m;
 
     for iteration = 1:max_iterations
-        
+    tic; 
 	%select random entry
         for index = randperm(n);
             %get layers output 
@@ -51,9 +51,19 @@ function [weights,output,error_per_iteration] = multilayer_perceptron_learn(entr
                 fflush(1);
 	        end
             h{M} = weights{M} * layer_entry{M}';
-            output(index) = activation_func(h{M});
+            
+            %no linear
+            %output(index) = activation_func(h{M});
             %get errors
-            d{M} = activation_der(h{M})*(expected_output(index) - output(index));
+            %d{M} = activation_der(h{M})*(expected_output(index) - output(index));
+            
+            %linear
+            output(index) = h{M};
+            %h{M};
+            %get errors
+            d{M} = (expected_output(index) - output(index));
+            %d{M};
+            
             for i = M-1:-1:1
                 d{i} = (activation_der(h{i})' .* (d{i+1} * weights{i+1}(:,2:end)));
             end
@@ -66,7 +76,7 @@ function [weights,output,error_per_iteration] = multilayer_perceptron_learn(entr
         end
         %get iteration error
         error_per_iteration(iteration) = sum((expected_output - output).^2)/n;
-        error_per_iteration(iteration)
+        [error_per_iteration(iteration),iteration,toc]
         fflush(1);
         if error_per_iteration(iteration) <= tolerance
             return
