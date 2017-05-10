@@ -12,7 +12,7 @@ function output = get_output(entries, weights, neurons_per_layer, activation_fun
         for m = 2:M
                 layer_entry{m}(2:end) = activation_func(weights{m-1} * layer_entry{m-1}');
         end
-        output(i) = activation_func(weights{M} * layer_entry{M}');
+        output(i) = (weights{M} * layer_entry{M}');
         i = i + 1;
     end   
 end
@@ -80,6 +80,12 @@ function [weights,output,error_per_iteration] = multilayer_perceptron_learn(entr
         fflush(1);
         if error_per_iteration(iteration) <= tolerance
             return
+        end
+        if error_per_iteration(iteration) <= 5e-4
+            learning_factor = .02;
+        end
+        if error_per_iteration(iteration) <= 4e-4
+            learning_factor = .01;
         end
     end
 
