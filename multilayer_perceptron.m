@@ -18,13 +18,13 @@ function output = get_output(entries, weights, neurons_per_layer, activation_fun
 end
 
 function [weights,output,error_per_iteration] = multilayer_perceptron_learn(entries, expected_output, neurons_per_layer, activation_func, activation_der,
-                                    learning_factor=.5, max_iterations=1000, tolerance=1e-5, dbug=false)
+                                    learning_factor=.5, max_iterations=1000, tolerance=1e-5, alpha=0, adaptative_eta=false, dbug=false)
     %number of entries
     n = length(entries(1,:));
 
     %number of layers
     m = 0;
-
+    a = alpha;
     %setup
     for i = 2:length(neurons_per_layer)
         m = m + 1;
@@ -35,7 +35,7 @@ function [weights,output,error_per_iteration] = multilayer_perceptron_learn(entr
     end
     %last layer
     M = m;
-
+  
     for iteration = 1:max_iterations
     tic; 
 	%select random entry
@@ -69,24 +69,45 @@ function [weights,output,error_per_iteration] = multilayer_perceptron_learn(entr
             end
             %correct weights
             d;
+            old_weigths = weights;
+            if iteration > 1 
+                prev_delta_w = delta_w;
+            end
             for i = 1:M
-                delta_w = learning_factor * d{i}' * layer_entry{i};
-                weights{i} = weights{i} + delta_w;
+              if iteration > 1 
+                delta_w{i} = learning_factor * d{i}' * layer_entry{i} + a * delta_w{i};
+              else 
+                delta_w{i} = learning_factor * d{i}' * layer_entry{i};
+              end
+                weights{i} = weights{i} + delta_w{i};
             end
         end
         %get iteration error
         error_per_iteration(iteration) = sum((expected_output - output).^2)/n;
+        if adaptative_eta
+          if iteration > 10 
+            if error_per_iteration(iteration) > error_per_iteration(iteration - 10)
+              weights = old_weigths;
+              delta_w = prev_delta_w;
+              learning_factor = 0.9 * learning_factor;
+              a = 0;
+            else 
+              a = alpha;
+              learning_factor = 1.1 * learning_factor;
+            end
+          end
+        end
         [error_per_iteration(iteration),iteration,toc]
         fflush(1);
         if error_per_iteration(iteration) <= tolerance
             return
         end
-        if error_per_iteration(iteration) <= 5e-4
-            learning_factor = .02;
-        end
-        if error_per_iteration(iteration) <= 4e-4
-            learning_factor = .01;
-        end
+        %if error_per_iteration(iteration) <= 5e-4
+         %   learning_factor = .02;
+        %end
+        %if error_per_iteration(iteration) <= 4e-4
+         %   learning_factor = .01;
+        %end
     end
 
 end

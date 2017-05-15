@@ -2,9 +2,9 @@
 source multilayer_perceptron.m
 terrain = dlmread('terrain/terrain03.data');
 terrain = terrain(2:end,:);
-[f,fder] = activation_exp(15);
+[f,fder] = activation_exp(1);
 net = [2,45,50,1];
-[weights,output,mse] = multilayer_perceptron_learn(terrain(:,1:2)',terrain(:,3)',net ,f,fder,.05,1e4,1e-3);
+[weights,output,mse] = multilayer_perceptron_learn(terrain(:,1:2)',terrain(:,3)',net,f,fder,.01,1e3,1e-4,0.9,true);
 x = [-3:0.01:3];
 y = x;
 %dlmwrite('weights.csv',cell2mat(weights));
