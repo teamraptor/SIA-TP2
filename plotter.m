@@ -5,7 +5,7 @@ for i = 1:length(x)
         end
 end
 
-plot3(terrain(:,1),terrain(:,2),terrain(:,3),'.','markersize',12)
+plot3(terrain(:,2),terrain(:,1),terrain(:,3),'.','markersize',12)
 hold on;
 surf(x,y,z);
 hold off;
