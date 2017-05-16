@@ -22,8 +22,10 @@ function [weights,output,error_per_iteration] = multilayer_perceptron_learn(entr
     %number of entries
     n = length(entries(1,:));
     eta = learning_factor;
+    
     %number of layers
     m = 0;
+    
     %setup
     for i = 2:length(neurons_per_layer)
         m = m + 1;
@@ -37,7 +39,7 @@ function [weights,output,error_per_iteration] = multilayer_perceptron_learn(entr
   
     for iteration = 1:max_iterations
     tic; 
-	%select random entry
+	  %select random entry
         for index = randperm(n);
             %get layers output 
             layer_entry{1}(2:end) = entries(:, index);
@@ -59,6 +61,7 @@ function [weights,output,error_per_iteration] = multilayer_perceptron_learn(entr
             %linear
             output(index) = h{M};
             %h{M};
+            
             %get errors
             d{M} = (expected_output(index) - output(index));
             %d{M};
@@ -66,6 +69,7 @@ function [weights,output,error_per_iteration] = multilayer_perceptron_learn(entr
             for i = M-1:-1:1
                 d{i} = (activation_der(h{i})' .* (d{i+1} * weights{i+1}(:,2:end)));
             end
+            
             %correct weights
             d;
             old_weigths = weights;
@@ -81,6 +85,7 @@ function [weights,output,error_per_iteration] = multilayer_perceptron_learn(entr
                 weights{i} = weights{i} + delta_w{i};
             end
         end
+        
         %get iteration error
         error_per_iteration(iteration) = sum((expected_output - output).^2)/n;
         if adaptative_eta
@@ -99,11 +104,16 @@ function [weights,output,error_per_iteration] = multilayer_perceptron_learn(entr
             a = alpha;
           end
         end
-        [error_per_iteration(iteration),iteration,toc, learning_factor]
-        fflush(1);
+        
+        if dbug
+          [error_per_iteration(iteration),iteration,toc, learning_factor]
+          fflush(1);
+        end
+        
         if error_per_iteration(iteration) <= tolerance
             return
         end
+        
         if(learning_factor < 0.001 * eta)
           learning_factor = 0.1 * eta;
         end
