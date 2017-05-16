@@ -3,7 +3,7 @@ source multilayer_perceptron.m
 source configuration.m
 
 terrain = dlmread(data_file);
-terrain = terrain(starting_line:end,:);
+terrain = terrain(starting_line:end, :);
 
 if activation == 'exp'
   [f,fder] = activation_exp(beta);
