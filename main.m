@@ -5,13 +5,13 @@ source configuration.m
 terrain = dlmread(data_file);
 terrain = terrain(starting_line:end, :);
 
-if activation == 'exp'
+if activation == 1
   [f,fder] = activation_exp(beta);
 else 
   [f,fder] = activation_tanh(beta);
 end
 
-[weights, output, mse] = multilayer_perceptron_learn(terrain(:,1:2)', terrain(:,3)', net, f, fder, eta, max_iterations, cut_error, alpha, adaptative_eta);
+[weights, output, mse, test_mse] = multilayer_perceptron_learn(terrain(:,1:2)', terrain(:,3)', train_percentage, net, f, fder, eta, max_iterations, cut_error, alpha, adaptative_eta);
 
 if print_error
   figure(1);
@@ -19,10 +19,18 @@ if print_error
   title("ECM");
   xlabel("Épocas");
   ylabel("ECM en escala logarítmica");
+  if length(test_mse) > 0
+    hold on;
+    semilogy(test_mse, 'LineWidth', 2);
+    total_error = mse * train_percentage + test_mse * (1-train_percentage);
+    semilogy(total_error, 'LineWidth', 2);
+    legend('ECM Entrenamiento','ECM Testeo', 'ECM Total');
+    hold off;
+  end
 end
 
 if print_estimation
-  figure(2);
+  figure(3);
   x = [-3:0.025:3];
   y = x;
   for i = 1:length(x)
